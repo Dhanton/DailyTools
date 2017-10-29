@@ -22,7 +22,7 @@ def main():
 	config_list = config_dir.joinpath("dir-list")
 	config_file = config_dir.joinpath("config")
 
-	def sync(dir_from, dir_to, compress, delete, test, update):
+	def sync(dir_from, dir_to, port, compress, delete, test, update):
 		args = ["-avr"]
 
 		if compress:
@@ -30,6 +30,8 @@ def main():
 
 		if update:
 			args.append("-u")
+
+		args.append("-e ssh -p " + str(port))
 
 		if test:
 			args.append("--list-only")
@@ -45,6 +47,7 @@ def main():
 	parser.add_argument("action", type=str, choices=["push", "pull"])
 	parser.add_argument("--rasp-user", "-ru", type=str)
 	parser.add_argument("--rasp-ip", "-ip", type=str)
+	parser.add_argument("--port", "-p", type=int, default=22)
 	parser.add_argument("--update", "-u", action="store_true", default=False)
 	parser.add_argument("--test", "-t", action="store_true", default=False)
 	parser.add_argument("--compress", "-c", action="store_true", default=True)
@@ -79,6 +82,8 @@ def main():
 			if args.rasp_ip:
 				json_file["rasp-ip"] = args.rasp_ip
 
+			json_file["port"] = args.port
+
 			json_file["update"] = args.update
 			json_file["compress"] = args.compress
 			json_file["delete"] = args.delete
@@ -95,14 +100,20 @@ def main():
 
 		user_cond = args.rasp_user or "rasp-user" in json_file
 		ip_cond = args.rasp_ip or "rasp-ip" in json_file
+		port_cond = args.port or "port" in json_file
 
-		if not user_cond or not ip_cond:
+		if not user_cond or not ip_cond or not port_cond:
 			print("Missing ip or user. Please specify it in the config file.")
 			return
 
 		# Use command line value if provided else use config file
 		rasp_user = args.rasp_user if args.rasp_user else json_file["rasp-user"]
 		rasp_ip = args.rasp_ip if args.rasp_ip else json_file["rasp-ip"]
+		
+		port = args.port
+
+		if port == 22 and "port" in json_file:
+			port = json_file["port"]
 
 		if not "update" in json_file or not "compress" in json_file or not "delete" in json_file or not "test" in json_file:
 			raise ConfigFileError("Missing config arguments in file")
@@ -119,7 +130,7 @@ def main():
 	dir_from = str(home_dir) if pushing else rasp_server
 	dir_to = rasp_server if pushing else str(home_dir)
 
-	sync(dir_from, dir_to, compress, delete, test, update)
+	sync(dir_from, dir_to, port, compress, delete, test, update)
 
 
 if __name__ == '__main__':
