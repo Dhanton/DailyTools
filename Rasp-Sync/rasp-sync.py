@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys, os, signal
 import subprocess
 import argparse
