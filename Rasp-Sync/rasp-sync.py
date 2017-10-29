@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, signal
 import subprocess
 import argparse
 import json
@@ -7,7 +7,13 @@ from pathlib import Path
 class ConfigFileError(Exception):
 	pass
 
+def signal_handler(signal, frame):
+	print("Ctrl+C signal received from keyboard. Closing. \n")
+	sys.exit(0)
+
 def main():
+	signal.signal(signal.SIGINT, signal_handler)
+
 	rasp_root = Path("~/Rasp-Sync")
 	home_dir = Path.home()
 	config_dir = home_dir.joinpath(".config/rasp-sync")
