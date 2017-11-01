@@ -202,7 +202,7 @@ bindsym XF86AudioPlay exec playerctl play
 bindsym XF86AudioPause exec playerctl pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
-#exec xrandr --output DP-1 --off --output HDMI-1 --off --out
+
 # Change resolution to 1600x900
 exec ~/.config/i3/change-resolution.sh
 
