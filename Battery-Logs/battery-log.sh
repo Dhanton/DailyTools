@@ -2,7 +2,7 @@
 
 is_charging=$(acpi | grep Charging)
 
-# Add differente prefix to log file depending if charging or not
+# Add different prefix to log file depending if charging or not
 if [[ $is_charging = "" ]]; then
 	prefix=$'dis'
 else
